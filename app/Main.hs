@@ -1,6 +1,9 @@
 module Main where
 
+import System.Environment
 import Parser
 
 main :: IO ()
-main = putStrLn "Yo"
+main = do
+    (arg:_) <- getArgs
+    putStrLn $ readExpr arg
