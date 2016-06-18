@@ -1,16 +1,15 @@
 module Parser where
 
 import Control.Monad
-import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec hiding (spaces)
 
-data LispVal = Atom String
-             | List [LispVal]
-             | DottedList [LispVal] LispVal
-             | Number Integer
-             | String String
-             | Bool Bool
+import DataTypes
 
+symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
+
+spaces :: Parser ()
+spaces = skipMany1 space
 
 parseString :: Parser LispVal
 parseString = do
@@ -31,14 +30,36 @@ parseAtom = do
 
 
 parseNumber :: Parser LispVal
-parseNumber = liftM (Number . read) $ many1 digit
+parseNumber = do
+    num <- many1 digit
+    return $ Number $ read num
+
+parseList :: Parser LispVal
+parseList = liftM List $ sepBy parseExpr spaces
+
+parseDottedList :: Parser LispVal
+parseDottedList = do
+    head <- endBy parseList spaces
+    tail <- char '.' >> spaces >> parseExpr
+    return $ DottedList head tail
+
+parseQuoted :: Parser LispVal
+parseQuoted = do
+    char '\''
+    x <- parseExpr
+    return $ List [Atom "quote", x]
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
           <|> parseString
           <|> parseNumber
+          <|> parseQuoted
+          <|> do char '('
+                 x <- try parseList <|> parseDottedList
+                 char ')'
+                 return x
 
-readExpr :: String -> String
+readExpr :: String -> LispVal
 readExpr input = case parse parseExpr "lisp" input of
-    Left err -> "No match: " ++ show err
-    Right val -> "It's a match!"
+    Left err -> String $ "No match: " ++ show err
+    Right val -> val

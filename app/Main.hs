@@ -2,8 +2,8 @@ module Main where
 
 import System.Environment
 import Parser
+import Evaluator
+import DataTypes
 
 main :: IO ()
-main = do
-    (arg:_) <- getArgs
-    putStrLn $ readExpr arg
+main = getArgs >>= print . eval . readExpr . head
