@@ -1,9 +1,13 @@
 module Main where
 
+import Control.Monad
 import System.Environment
 import Parser
 import Evaluator
-import DataTypes
+import Error
 
 main :: IO ()
-main = getArgs >>= print . eval . readExpr . head
+main = do
+    (args:_) <- getArgs
+    evaled <- return $ liftM show $ readExpr args >>= eval
+    putStrLn $ extractValue $ trapError evaled
