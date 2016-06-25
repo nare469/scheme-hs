@@ -13,10 +13,10 @@ showVal :: LispVal -> String
 showVal (String val) = "\"" ++ val ++ "\""
 showVal (Atom val) = val
 showVal (Number num) =  show num
+showVal (Bool bool) = if bool == True then "#t" else "#f"
 showVal (List val) = "(" ++ unwordsList val ++ ")"
 showVal (DottedList head tail) = "(" ++ unwordsList head ++ " . " ++ showVal tail ++ ")"
 
 
 unwordsList :: [LispVal] -> String
 unwordsList = unwords . map showVal
-
