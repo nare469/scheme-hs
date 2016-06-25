@@ -1,13 +1,11 @@
 module Main where
 
-import Control.Monad
 import System.Environment
-import Parser
-import Evaluator
-import Error
+import Repl
 
 main :: IO ()
-main = do
-    (args:_) <- getArgs
-    evaled <- return $ liftM show $ readExpr args >>= eval
-    putStrLn $ extractValue $ trapError evaled
+main = do args <- getArgs
+          case length args of
+            0 -> runRepl
+            1 -> evalAndPrint $ args !! 0
+            otherwise -> putStrLn "Invalid number of arguments"
