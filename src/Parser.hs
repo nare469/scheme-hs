@@ -4,7 +4,6 @@ import Control.Monad.Except
 import Text.ParserCombinators.Parsec hiding (spaces)
 
 import DataTypes
-import Error
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
